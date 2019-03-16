@@ -1,5 +1,5 @@
 import { appName } from '../config'
-import { Record, fromJS, List } from 'immutable'
+import { Record, OrderedMap, List } from 'immutable'
 import { createSelector } from 'reselect'
 import api from '../services/api'
 
@@ -40,7 +40,7 @@ export default function reducer(state = new ReducerRecord(), action) {
       return state
         .set('loading', false)
         .set('loaded', true)
-        .update('entities', (entities) => entities.concat(fromJS(payload.data)))
+        .set('entities', List(payload.data.map((item) => OrderedMap(item)))) // to keep order of properties
 
     case TOGGLE_SHOW:
       return state.updateIn(
@@ -72,7 +72,10 @@ export default function reducer(state = new ReducerRecord(), action) {
 export const usersSelector = (state) => state[moduleName]
 export const getUsersSelector = createSelector(
   usersSelector,
-  (users) => users.get('entities').toJS()
+  (users) => {
+    console.log(users)
+    return users.get('entities').toJS()
+  }
 )
 
 export const isErrorSelector = createSelector(
