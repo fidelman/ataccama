@@ -16,16 +16,21 @@ const styles = {
 }
 
 function TableContainer({ classes, data }) {
-  function getTableRows(data, headers) {
-    function getNestedRows(kids) {
+  function toggleShow(name, path) {
+    console.log(name, path)
+  }
+
+  function getTableRows(data, headers, nestingLevel) {
+    function getNestedRows(kids, nestingLevel) {
       return Object.keys(kids).map((kidName) => {
         const kid = kids[kidName]
+        const newNestingLevel = [...nestingLevel, 'kids', kidName, 'records']
         return (
           <TableRow key={kidName}>
             <TableCell className={classes.cell} colSpan={headers.length + 1}>
               <Container>
                 {kidName}
-                {generateTable(kid.records)}
+                {generateTable(kid.records, newNestingLevel)}
               </Container>
             </TableCell>
           </TableRow>
@@ -33,26 +38,41 @@ function TableContainer({ classes, data }) {
       })
     }
 
-    return data.map((item, i) => (
-      <React.Fragment key={i}>
-        <TableRow>
-          {headers.map((header, j) => (
-            <TableCell key={j}>{item.data[header] || ''}</TableCell>
-          ))}
-          <TableCell>
-            <Button size="small" variant="outlined" color="secondary">
-              Remove
-            </Button>
-            {Object.keys(item.kids).length ? (
-              <Button size="small" variant="outlined" color="primary">
-                More
+    return data.map((item, i) => {
+      const newNestingLevel = [...nestingLevel, i]
+      return (
+        <React.Fragment key={i}>
+          <TableRow>
+            {headers.map((header, j) => (
+              <TableCell key={j}>{item.data[header] || ''}</TableCell>
+            ))}
+            <TableCell>
+              <Button
+                onClick={() => toggleShow('remove', newNestingLevel)}
+                size="small"
+                variant="outlined"
+                color="secondary"
+              >
+                Remove
               </Button>
-            ) : null}
-          </TableCell>
-        </TableRow>
-        {Object.keys(item.kids).length ? getNestedRows(item.kids) : null}
-      </React.Fragment>
-    ))
+              {Object.keys(item.kids).length ? (
+                <Button
+                  size="small"
+                  onClick={() => toggleShow('more', newNestingLevel)}
+                  variant="outlined"
+                  color="primary"
+                >
+                  {item.data.isOpen ? 'Less' : 'More'}
+                </Button>
+              ) : null}
+            </TableCell>
+          </TableRow>
+          {Object.keys(item.kids).length && !item.data.isOpen
+            ? getNestedRows(item.kids, newNestingLevel)
+            : null}
+        </React.Fragment>
+      )
+    })
   }
 
   function getHeaders(data) {
@@ -73,7 +93,7 @@ function TableContainer({ classes, data }) {
     return headers
   }
 
-  function generateTable(data) {
+  function generateTable(data, nestingLevel) {
     const headers = getHeaders(data)
     return (
       <Paper>
@@ -86,13 +106,13 @@ function TableContainer({ classes, data }) {
               <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>{getTableRows(data, headers)}</TableBody>
+          <TableBody>{getTableRows(data, headers, nestingLevel)}</TableBody>
         </Table>
       </Paper>
     )
   }
 
-  return generateTable(data)
+  return generateTable(data, [])
 }
 
 export default withStyles(styles)(TableContainer)
