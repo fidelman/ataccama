@@ -26,10 +26,6 @@ jobs:
             - ~/.cache
 
       - run:
-          name: Unit tests
-          command: npm run test
-
-      - run:
           name: Run Server
           command: npm start
           background: true
