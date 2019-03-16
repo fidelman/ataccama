@@ -1,7 +1,8 @@
 import { appName } from '../config'
-import { Record, OrderedMap, List } from 'immutable'
+import { Record, List } from 'immutable'
 import { createSelector } from 'reselect'
 import api from '../services/api'
+import fromJSOrdered from '../utilities/from-js-ordered'
 
 /**
  * Constants
@@ -40,7 +41,7 @@ export default function reducer(state = new ReducerRecord(), action) {
       return state
         .set('loading', false)
         .set('loaded', true)
-        .set('entities', List(payload.data.map((item) => OrderedMap(item)))) // to keep order of properties
+        .set('entities', fromJSOrdered(payload.data)) // to keep order of properties
 
     case TOGGLE_SHOW:
       return state.updateIn(
@@ -54,6 +55,7 @@ export default function reducer(state = new ReducerRecord(), action) {
           'entities',
           ...payload.nestingLevel.slice(0, -1)
         ])
+
         if (parent.size === 1)
           return state.deleteIn([
             'entities',
@@ -73,7 +75,6 @@ export const usersSelector = (state) => state[moduleName]
 export const getUsersSelector = createSelector(
   usersSelector,
   (users) => {
-    console.log(users)
     return users.get('entities').toJS()
   }
 )
