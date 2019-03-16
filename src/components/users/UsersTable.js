@@ -6,7 +6,7 @@ import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Paper from '@material-ui/core/Paper'
 import { withStyles } from '@material-ui/core/styles'
-import { Container } from '../globalStyles'
+import { Container } from '../../globalStyles'
 import Button from '@material-ui/core/Button'
 
 const styles = {
@@ -15,7 +15,7 @@ const styles = {
   }
 }
 
-function TableContainer({ classes, data }) {
+function UsersTable({ classes, data }) {
   function toggleShow(name, path) {
     console.log(name, path)
   }
@@ -115,4 +115,4 @@ function TableContainer({ classes, data }) {
   return generateTable(data, [])
 }
 
-export default withStyles(styles)(TableContainer)
+export default withStyles(styles)(UsersTable)
