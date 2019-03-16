@@ -20,7 +20,6 @@ function UsersTable({ classes, data, toggleShow, removeUser }) {
     function getNestedRows(kids, nestingLevel) {
       return Object.keys(kids).map((kidName) => {
         const kid = kids[kidName]
-        // if (!kid.records.length) return null
         const newNestingLevel = [...nestingLevel, 'kids', kidName, 'records']
         return (
           <TableRow key={kidName}>
@@ -39,12 +38,13 @@ function UsersTable({ classes, data, toggleShow, removeUser }) {
       const newNestingLevel = [...nestingLevel, i]
       return (
         <React.Fragment key={i}>
-          <TableRow>
+          <TableRow className="cy-row">
             {headers.map((header, j) => (
               <TableCell key={j}>{item.data[header] || ''}</TableCell>
             ))}
             <TableCell>
               <Button
+                className="cy-btn-remove"
                 size="small"
                 variant="outlined"
                 color="secondary"
@@ -55,6 +55,7 @@ function UsersTable({ classes, data, toggleShow, removeUser }) {
               {Object.keys(item.kids).length ? (
                 <Button
                   size="small"
+                  className="cy-toggle-show"
                   onClick={() => toggleShow(newNestingLevel)}
                   variant="outlined"
                   color="primary"
