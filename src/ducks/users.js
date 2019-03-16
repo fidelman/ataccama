@@ -13,6 +13,9 @@ export const FETCH_USERS_REQUEST = `${prefix}/FETCH_USERS_REQUEST`
 export const FETCH_USERS_SUCCESS = `${prefix}/FETCH_USERS_SUCCESS`
 export const FETCH_USERS_FAIL = `${prefix}/FETCH_USERS_FAIL`
 
+export const TOGGLE_SHOW = `${prefix}/TOGGLE_SHOW`
+export const REMOVE_USER = `${prefix}/REMOVE_USER`
+
 /**
  * Reducer
  */
@@ -39,6 +42,25 @@ export default function reducer(state = new ReducerRecord(), action) {
         .set('loaded', true)
         .update('entities', (entities) => entities.concat(fromJS(payload.data)))
 
+    case TOGGLE_SHOW:
+      return state.updateIn(
+        ['entities', ...payload.nestingLevel, 'data', 'isOpen'],
+        (isOpen) => !isOpen
+      )
+
+    case REMOVE_USER:
+      if (payload.nestingLevel.length !== 1) {
+        const parent = state.getIn([
+          'entities',
+          ...payload.nestingLevel.slice(0, -1)
+        ])
+        if (parent.size === 1)
+          return state.deleteIn([
+            'entities',
+            ...payload.nestingLevel.slice(0, -2)
+          ])
+      }
+      return state.deleteIn(['entities', ...payload.nestingLevel])
     default:
       return state
   }
@@ -87,3 +109,13 @@ export const fetchAllUsers = () => (dispatch) => {
       })
     )
 }
+
+export const toggleShow = (nestingLevel) => ({
+  type: TOGGLE_SHOW,
+  payload: { nestingLevel }
+})
+
+export const removeUser = (nestingLevel) => ({
+  type: REMOVE_USER,
+  payload: { nestingLevel }
+})

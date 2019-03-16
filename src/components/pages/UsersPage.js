@@ -5,13 +5,22 @@ import {
   fetchAllUsers,
   getUsersSelector,
   isErrorSelector,
-  isLoadedSelector
+  isLoadedSelector,
+  toggleShow,
+  removeUser
 } from '../../ducks/users'
 import Error from '../common/Error'
 import Loader from '../common/Loader'
 import UsersTable from '../users/UsersTable'
 
-function UsersPage({ isError, isLoaded, users, fetchAllUsers }) {
+function UsersPage({
+  isError,
+  isLoaded,
+  users,
+  fetchAllUsers,
+  toggleShow,
+  removeUser
+}) {
   useEffect(() => {
     fetchAllUsers()
   }, [])
@@ -19,14 +28,18 @@ function UsersPage({ isError, isLoaded, users, fetchAllUsers }) {
   if (isError) return <Error />
   if (!isLoaded) return <Loader />
 
-  return <UsersTable data={users} />
+  return (
+    <UsersTable data={users} toggleShow={toggleShow} removeUser={removeUser} />
+  )
 }
 
 UsersPage.propTypes = {
   isError: PropTypes.object,
   isLoaded: PropTypes.bool.isRequired,
   users: PropTypes.arrayOf(PropTypes.object).isRequired,
-  fetchAllUsers: PropTypes.func.isRequired
+  fetchAllUsers: PropTypes.func.isRequired,
+  toggleShow: PropTypes.func.isRequired,
+  removeUser: PropTypes.func.isRequired
 }
 
 export default connect(
@@ -35,5 +48,5 @@ export default connect(
     isError: isErrorSelector(state),
     isLoaded: isLoadedSelector(state)
   }),
-  { fetchAllUsers }
+  { fetchAllUsers, toggleShow, removeUser }
 )(UsersPage)

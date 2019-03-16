@@ -15,15 +15,12 @@ const styles = {
   }
 }
 
-function UsersTable({ classes, data }) {
-  function toggleShow(name, path) {
-    console.log(name, path)
-  }
-
+function UsersTable({ classes, data, toggleShow, removeUser }) {
   function getTableRows(data, headers, nestingLevel) {
     function getNestedRows(kids, nestingLevel) {
       return Object.keys(kids).map((kidName) => {
         const kid = kids[kidName]
+        // if (!kid.records.length) return null
         const newNestingLevel = [...nestingLevel, 'kids', kidName, 'records']
         return (
           <TableRow key={kidName}>
@@ -48,17 +45,17 @@ function UsersTable({ classes, data }) {
             ))}
             <TableCell>
               <Button
-                onClick={() => toggleShow('remove', newNestingLevel)}
                 size="small"
                 variant="outlined"
                 color="secondary"
+                onClick={() => removeUser(newNestingLevel)}
               >
                 Remove
               </Button>
               {Object.keys(item.kids).length ? (
                 <Button
                   size="small"
-                  onClick={() => toggleShow('more', newNestingLevel)}
+                  onClick={() => toggleShow(newNestingLevel)}
                   variant="outlined"
                   color="primary"
                 >
@@ -67,7 +64,7 @@ function UsersTable({ classes, data }) {
               ) : null}
             </TableCell>
           </TableRow>
-          {Object.keys(item.kids).length && !item.data.isOpen
+          {Object.keys(item.kids).length && item.data.isOpen
             ? getNestedRows(item.kids, newNestingLevel)
             : null}
         </React.Fragment>
@@ -79,7 +76,7 @@ function UsersTable({ classes, data }) {
     const { headers } = data.reduce(
       ({ headers, hash }, item) => {
         Object.keys(item.data).forEach((data) => {
-          if (!hash[data]) {
+          if (!hash[data] && data !== 'isOpen') {
             headers.push(data)
             hash[data] = true
           }
